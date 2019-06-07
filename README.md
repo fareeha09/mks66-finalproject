@@ -6,4 +6,4 @@ Name: Fareeha Tabassum
 
 ## Features of Project:
 * Shading Models - Gouraud and Phong Shading
-* New Shapes
+* New Primitive Shapes
