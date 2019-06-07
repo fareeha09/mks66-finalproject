@@ -1,8 +1,8 @@
 # mks66-finalproject
 
-Name: Fareeha Tabassum
+Group Name: Lone Turtle
 
-Lone Turtle
+Name: Fareeha Tabassum
 
 ## Features of Project:
 * Shading Models - Gouraud and Phong Shading
