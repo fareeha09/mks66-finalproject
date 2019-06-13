@@ -20,6 +20,21 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color):
         x+= 1
         z+= delta_z
 
+def gouraud(polygons, point, zbuffer, view, ambient, symbols, reflect, n , screen):
+    while i is not len(polygons)-1:
+        #find surface normal for each vertex in polygon
+        normal0 = calculate_normal(polygons, i)
+        normal1 = calculate_normal(polygons, i+1)
+        normal2 = calculate_normal(polygons, i+2)
+
+        i+=3
+
+
+        #rgb values for each surface normal
+        for n in range(
+        
+        
+
 def scanline_convert(polygons, i, screen, zbuffer, color):
     flip = False
     BOT = 0
@@ -152,8 +167,15 @@ def add_cylinder(polygons, cx, cy, cz, r, h, step):
     longt_stop = step
 
     for y in range(h):
-        for i in range(len(points)):
-            add_polygon(points[i], points
+        for i in range(len(points)-1):
+            #add one side of a cyliner
+            add_polygon(polygons, points[i][0], points[i][1], points[i][2],
+                            points[i+1][0], points[i+1][1], points[i+1][2],
+                            points[i+1][0], points[i+1][1], points[i+1][2]+h)
+            add_polygon(polygons, points[i][0], points[i][1], points[i][2],
+                            points[i][0], points[i][1], points[i][2]+h,
+                            points[i+1][0], points[i+1][1], points[i+1][2]+h)
+            
 
 def generate_cylinder( cx, cy, cz, r, step):
     points = []
@@ -181,6 +203,11 @@ def add_cone(polygons, cx, cx, cz, r, h, step):
     lat_stop = step
     longt_start = 0
     longt_stop = step
+
+    
+
+
+def generate_cone(cx, cy, cz, r, step)
 
 def add_sphere(polygons, cx, cy, cz, r, step ):
     points = generate_sphere(cx, cy, cz, r, step)
