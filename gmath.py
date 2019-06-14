@@ -41,8 +41,6 @@ def get_lighting(normal, view, ambient, light, symbols, reflect ):
 
     return i
 
-def gouraud_shading(
-
 def calculate_ambient(alight, reflect):
     a = [0, 0, 0]
     a[RED] = alight[RED] * reflect['red'][AMBIENT]
