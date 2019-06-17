@@ -1,6 +1,8 @@
 import lex, yacc
 
 tokens = (
+    "CONE",
+    "CYLINDER",
     "STRING",
     "ID",
     "XYZ",
@@ -42,6 +44,8 @@ tokens = (
 )
 
 reserved = {
+    "cone" : "CONE",
+    "cylinder" : "CYLINDER",
     "x" : "XYZ", 
     "y" : "XYZ", 
     "z" : "XYZ", 
@@ -162,6 +166,40 @@ def p_command_show(p):
     """command : DISPLAY"""
     commands.append({'op' : p[1], 'args' : None})
 
+def p_command_cylinder(p):
+    """command : CYLINDER NUMBER NUMBER NUMBER NUMBER NUMBER
+               | CYLINDER SYMBOL NUMBER NUMBER NUMBER NUMBER NUMBER
+               | CYLINDER NUMBER NUMBER NUMBER NUMBER NUMBER SYMBOL
+               | CYLINDER SYMBOL NUMBER NUMBER NUMBER NUMBER NUMBER SYMBOL"""
+    cmd = {'op' : p[1], 'constants' : None, 'cs' : None, 'args':[]}
+    arg_start = 2
+    if isinstance(p[2], str):
+        cmd['constants'] = p[2]
+        arg_start = 3
+    if len(p) == 8 and isinstance(p[7], str):
+        cmd['cs'] = p[7]
+    if len(p) == 9 and isinstance(p[8], str):
+          cmd['cs'] = p[8]
+    cmd['args'] = p[arg_start:arg_start+5]
+    commands.append(cmd)
+
+def p_command_cone(p):
+    """command : CONE NUMBER NUMBER NUMBER NUMBER NUMBER
+               | CONE SYMBOL NUMBER NUMBER NUMBER NUMBER NUMBER
+               | CONE NUMBER NUMBER NUMBER NUMBER NUMBER SYMBOL
+               | CONE SYMBOL NUMBER NUMBER NUMBER NUMBER NUMBER SYMBOL"""
+    cmd = {'op' : p[1], 'constants' : None, 'cs' : None, 'args':[]}
+    arg_start = 2
+    if isinstance(p[2], str):
+        cmd['constants'] = p[2]
+        arg_start = 3
+    if len(p) == 8 and isinstance(p[7], str):
+        cmd['cs'] = p[7]
+    if len(p) == 9 and isinstance(p[8], str):
+          cmd['cs'] = p[8]
+    cmd['args'] = p[arg_start:arg_start+5]
+    commands.append(cmd)
+	
 def p_command_sphere(p):
     """command : SPHERE NUMBER NUMBER NUMBER NUMBER
                | SPHERE SYMBOL NUMBER NUMBER NUMBER NUMBER

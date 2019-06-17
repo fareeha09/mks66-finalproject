@@ -166,6 +166,7 @@ def run(filename):
                     shading = 'gouraud'
                 elif command['shade_type'] == 'phong':
                     shading = 'phong'
+			
             elif c == 'box':
                 if command['constants']:
                     reflect = command['constants']

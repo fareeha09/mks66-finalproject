@@ -63,7 +63,8 @@ def scanline_convert(polygons, i, screen, zbuffer, color):
         z1+= dz1
         y+= 1
 		
-def draw_gouraud_scanline(x0, z0, x1, z1, y, screen, zbuffer, xc0, xc1):
+def g_draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, c0, c1):
+    print c0
     if x0 > x1:
         tx = x0
         tz = z0
@@ -71,35 +72,36 @@ def draw_gouraud_scanline(x0, z0, x1, z1, y, screen, zbuffer, xc0, xc1):
         z0 = z1
         x1 = tx
         z1 = tz
-        c = xc1[:]
-        xc1 = xc0[:]
-        xc0 = c[:]
+        c = c1[:]
+        c1 = c0[:]
+        c0 = c[:]
 
     x = x0
     z = z0
+    print c1
     delta_z = (z1 - z0) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
-    delta_r = (xc1[0] - xc0[0]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
-    delta_g = (xc1[1] - xc0[1]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
-    delta_b = (xc1[2] - xc0[2]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
+    delta_r = (c1[0] - c0[0]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
+    delta_g = (c1[1] - c0[1]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
+    delta_b = (c1[2] - c0[2]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
 	
     while x <= x1:
-	    c0 = [int(c) for c in xc0]
-	    plot(screen, zbuffer, c0, x, y, z)
+	    cc0 = [int(c) for c in c0]
+	    plot(screen, zbuffer, cc0, x, y, z)
 	    x+= 1
 	    z+= delta_z
-	    xc0[0] += delta_r
-	    xc0[1] += delta_g
-	    xc0[2] += delta_b
+	    c0[0] += delta_r
+	    c0[1] += delta_g
+	    c0[2] += delta_b
 		
 #passes three colors of the polygon vertexes
-def scanline_gouraud_convert(polygons, i, screen, zbuffer, v0, v1, v2):
+def g_scanline_convert(polygons, i, screen, zbuffer, v0, v1, v2):
     flip = False
     BOT = 0
     TOP = 2
     MID = 1
     colors= [v0, v1, v2]
-    points = [ (polygons[i][0], polygons[i][1], polygons[i][2], colors[0][0], colors[0][1], colors[0][2])
-               (polygons[i+1][0], polygons[i+1][1], polygons[i+1][2], colors[1][0], colors[1][1], colors[1][2])
+    points = [ (polygons[i][0], polygons[i][1], polygons[i][2], colors[0][0], colors[0][1], colors[0][2]),
+               (polygons[i+1][0], polygons[i+1][1], polygons[i+1][2], colors[1][0], colors[1][1], colors[1][2]),
                (polygons[i+2][0], polygons[i+2][1], polygons[i+2][2], colors[2][0], colors[2][1], colors[2][2]) ]
 
     points.sort(key = lambda x: x[1])
@@ -140,7 +142,7 @@ def scanline_gouraud_convert(polygons, i, screen, zbuffer, v0, v1, v2):
                 col1 = points[MID][i]
 				
         #draw_line(int(x0), y, z0, int(x1), y, z1, screen, zbuffer, color)
-        draw_gouraud_scanline(int(x0), z0, int(x1), z1, y, screen, zbuffer, col0, col1)
+        g_draw_scanline(int(x0), z0, int(x1), z1, y, screen, zbuffer, col0, col1)
         x0+= dx0
         z0+= dz0
         x1+= dx1
@@ -228,7 +230,7 @@ def draw_polygons( polygons, screen, zbuffer, view, ambient, light, symbols, ref
 				c0 = get_lighting(normal, view, ambient, light, symbols, reflect )
 				c1 = get_lighting(normal, view, ambient, light, symbols, reflect )
 				c2 = get_lighting(normal, view, ambient, light, symbols, reflect )
-				scanline_gouraud_convert(polygons, point, screen, zbuffer, c0, c1, c2)
+				g_scanline_convert(polygons, point, screen, zbuffer, c0, c1, c2)
 			point+= 3
 
     elif shading == 'phong':	
@@ -243,7 +245,7 @@ def draw_polygons( polygons, screen, zbuffer, view, ambient, light, symbols, ref
 			
 def add_box( polygons, x, y, z, width, height, depth ):
     x1 = x + width
-    y1 = y - height
+    y1 = y - height  
     z1 = z - depth
 
     #front
@@ -269,57 +271,38 @@ def add_box( polygons, x, y, z, width, height, depth ):
     add_polygon(polygons, x, y1, z, x, y1, z1, x1, y1, z1)
 
 def add_cylinder(polygons, cx, cy, cz, r, h, step):
-    points = generate_cylinder(cx, cy, cz, r, h, step)
+    circ0 = []
+    add_circle(circ0, cx, cy, cz, r, step)
+    circ1 = []
+    add_circle(circ1, cx, cy, cz+h, r, step)
 
-    lat_start = 0
-    lat_stop = step
-    longt_start = 0
-    longt_stop = step
-
-    for y in range(h):
-        for i in range(len(points)-1):
-            #add one side of a cyliner
-            add_polygon(polygons, points[i][0], points[i][1], points[i][2],
-                            points[i+1][0], points[i+1][1], points[i+1][2],
-                            points[i+1][0], points[i+1][1], points[i+1][2]+h)
-            add_polygon(polygons, points[i][0], points[i][1], points[i][2],
-                            points[i][0], points[i][1], points[i][2]+h,
-                            points[i+1][0], points[i+1][1], points[i+1][2]+h)
-            
-
-def generate_cylinder( cx, cy, cz, r, step):
-    points = []
-
-    rot_start = 0
-    rot_stop = step
-    circ_start = 0
-    circ_stop = step
-
-    for circle in range(circ_start, circ_stop):
-            circ = circle/float(step)
-
-            x = r * math.cos(math.pi * circ) + cx
-            y = r * math.sin(math.pi * circ) * math.cos(2*math.pi * rot) + cy
-            z = r * math.sin(math.pi * circ) * math.sin(2*math.pi * rot) + cz
-
-            points.append([x, y, z])
-            #print 'rotation: %d\tcircle%d'%(rotation, circle)
-    return points
-
-def add_cone(polygons, cx, cy, cz, r, h, step):
-    points = generate_cone(cx, cy, cz, r, h, step)
-
-    lat_start = 0
-    lat_stop = step
-    longt_start = 0
-    longt_stop = step
-
+    #fill in the circles
+    for i in range(len(circ0)-1):	
+        #first circle
+        add_polygon(polygons, cx, cy, cz, circ0[i][0], circ0[i][1], circ0[i][2], circ0[i+1][0], circ0[i+1][1], circ0[i+1][2])
+        #second circle
+        add_polygon(polygons, cx, cy, cz, circ1[i][0], circ1[i][1], circ1[i][2], circ1[i+1][0], circ1[i+1][1], circ1[i+1][2])		
     
+	#sides
+    for j in range (len(circ0)-1):
+        add_polygon(polygons, circ0[i][0], circ0[i][1], circ0[i][2], circ0[i+1][0], circ0[i+1][1], circ0[i+1][2], circ1[i][0], circ1[i][1], circ1[i][2])
+        add_polygon(polygons, circ0[i+1][0], circ0[i+1][1], circ0[i+1][2], circ1[i+1][0], circ1[i+1][1], circ1[i+1][2], circ1[i][0], circ1[i][1], circ1[i][2])
+        add_polygon(polygons, circ0[i+1][0], circ0[i+1][1], circ0[i+1][2], circ0[i][0], circ0[i][1], circ0[i][2], circ1[i][0], circ1[i][1], circ1[i][2])
+        add_polygon(polygons, circ0[i+1][0], circ0[i+1][1], circ0[i+1][2], circ1[i][0], circ1[i][1], circ1[i][2], circ1[i+1][0], circ1[i+1][1], circ1[i+1][2])
+		
+def add_cone(polygons, cx, cy, cz, r, h, step):
+    circ0 = []
+    add_circle(circ0, cx, cy, cz, r, step)
 
-
-def generate_cone(cx, cy, cz, r, step):
-    pass
-
+    #fill in circle
+    for i in range(len(circ0)-1):	
+        #first circle
+        add_polygon(polygons, cx, cy, cz, circ0[i][0], circ0[i][1], circ0[i][2], circ0[i+1][0], circ0[i+1][1], circ0[i+1][2])
+	
+	#draw cone sides
+    for j in range(len(circ0)-1):
+        add_polygon(polygons, cx, cy, cz+h, circ0[i][0], circ0[i][1], circ0[i][2], circ0[i+1][0], circ0[i+1][1], circ0[i+1][2])	    
+    
 def add_sphere(polygons, cx, cy, cz, r, step ):
     points = generate_sphere(cx, cy, cz, r, step)
 
