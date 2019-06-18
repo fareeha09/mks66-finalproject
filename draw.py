@@ -64,21 +64,22 @@ def scanline_convert(polygons, i, screen, zbuffer, color):
         y+= 1
 		
 def g_draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, c0, c1):
-    print c0
+    #pass
+	#print c0
     if x0 > x1:
         tx = x0
         tz = z0
         x0 = x1
         z0 = z1
-        x1 = tx
+        x1 = tx  
         z1 = tz
-        c = c1[:]
-        c1 = c0[:]
-        c0 = c[:]
+        c = c1
+        c1 = c0
+        c0 = c
 
     x = x0
     z = z0
-    print c1
+    #print c1
     delta_z = (z1 - z0) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
     delta_r = (c1[0] - c0[0]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
     delta_g = (c1[1] - c0[1]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
@@ -95,6 +96,7 @@ def g_draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, c0, c1):
 		
 #passes three colors of the polygon vertexes
 def g_scanline_convert(polygons, i, screen, zbuffer, v0, v1, v2):
+    #pass
     flip = False
     BOT = 0
     TOP = 2
@@ -120,12 +122,16 @@ def g_scanline_convert(polygons, i, screen, zbuffer, v0, v1, v2):
     dx1 = (points[MID][0] - points[BOT][0]) / distance1 if distance1 != 0 else 0
     dz1 = (points[MID][2] - points[BOT][2]) / distance1 if distance1 != 0 else 0
 	
+    col0 = []
+    col1 = []
+    dcol1 = []
+    dcol0 = []
 	#since it's one color, it's an array holding rbg values
     for i in range(3, 6):
-        col0= points[TOP][i]
-        col1= points[MID][i]
-        dcol0 = points[TOP][i]-points[BOT][i] / distance0 if distance0 != 0 else 0  
-        dcol1 = points[MID][i]-points[BOT][i] / distance0 if distance0 != 0 else 0
+        col0.append(points[TOP][i])
+        col1.append(points[MID][i])
+        dcol0.append(points[TOP][i]-points[BOT][i] / distance0) if distance0 != 0 else 0  
+        dcol1.append(points[MID][i]-points[BOT][i] / distance0) if distance0 != 0 else 0
 		
     while y <= int(points[TOP][1]):
         if ( not flip and y >= int(points[MID][1])):
@@ -137,10 +143,14 @@ def g_scanline_convert(polygons, i, screen, zbuffer, v0, v1, v2):
             x1 = points[MID][0]
             z1 = points[MID][2]
             
+            col1=[]
+            dcol1=[]
             for i in range(3, 6):
-                dcol1 = points[TOP][i] - points[MID][i] / distance2 if distance2 != 0 else 0
-                col1 = points[MID][i]
-				
+                #if i==3:
+                #    col1 = points[MID][i]
+                dcol1.append(points[TOP][i] - points[MID][i] / distance2) if distance2 != 0 else 0
+                col1.append(points[MID][i])
+        #print 34 + 24.666666666666666666
         #draw_line(int(x0), y, z0, int(x1), y, z1, screen, zbuffer, color)
         g_draw_scanline(int(x0), z0, int(x1), z1, y, screen, zbuffer, col0, col1)
         x0+= dx0
@@ -148,9 +158,13 @@ def g_scanline_convert(polygons, i, screen, zbuffer, v0, v1, v2):
         x1+= dx1
         z1+= dz1
         y+= 1
-        for i in range(3, 6):
-            col0 = col0[i] + dcol0[i]
-            col1 = col1[i] + dcol1[i]
+        tempcol0=col0
+        tempcol1=col1
+        col0 = []
+        col1 = []		
+        for i in range(3):
+            col0.append(tempcol0[i] + dcol0[i])
+            col1.append(tempcol1[i] + dcol1[i])
 			
 def draw_phong_scanline():
 	pass

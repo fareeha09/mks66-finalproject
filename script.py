@@ -154,7 +154,7 @@ def run(filename):
         #print stack
         #loops through commands
         for command in commands:
-            print command
+            #print command
             c = command['op']
             args = command['args']
             knob_value = 1			
@@ -166,7 +166,22 @@ def run(filename):
                     shading = 'gouraud'
                 elif command['shade_type'] == 'phong':
                     shading = 'phong'
-			
+            elif c == 'cylinder':
+                if command['constants']:
+                    reflect = command['constants']
+                add_cylinder(tmp, args[0], args[1], args[2], args[3], args[4], step_3d)
+                matrix_mult( stack[-1], tmp )
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect, shading)
+                tmp = []
+                reflect = '.white'
+            elif c == 'cone':
+                if command['constants']:
+                    reflect = command['constants']
+                add_cone(tmp, args[0], args[1], args[2], args[3], args[4], step_3d)
+                matrix_mult( stack[-1], tmp )
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect, shading)
+                tmp = []
+                reflect = '.white'					
             elif c == 'box':
                 if command['constants']:
                     reflect = command['constants']
@@ -240,7 +255,7 @@ def run(filename):
             elif c == 'vary':
                 pass
         # end operation loop
-		n = format(fr, "03")
+                n = format(fr, "03")
         save_extension(screen, "anim/" + name + n)
 		
         make_animation(name)

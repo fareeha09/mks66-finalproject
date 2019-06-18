@@ -5,5 +5,5 @@ Group Name: Lone Turtle
 Name: Fareeha Tabassum
 
 ## Features of Project:
-* Shading Models - Gouraud and Phong Shading
-* New Primitive Shapes
+* Shading Models - Gouraud Shading
+* New Primitive Shapes- cylinder, cone

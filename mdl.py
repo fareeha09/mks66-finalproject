@@ -173,6 +173,7 @@ def p_command_cylinder(p):
                | CYLINDER SYMBOL NUMBER NUMBER NUMBER NUMBER NUMBER SYMBOL"""
     cmd = {'op' : p[1], 'constants' : None, 'cs' : None, 'args':[]}
     arg_start = 2
+    #print cmd['args']
     if isinstance(p[2], str):
         cmd['constants'] = p[2]
         arg_start = 3
@@ -207,6 +208,7 @@ def p_command_sphere(p):
                | SPHERE SYMBOL NUMBER NUMBER NUMBER NUMBER SYMBOL"""
     cmd = {'op' : p[1], 'constants' : None, 'cs' : None, 'args':[]}
     arg_start = 2
+    #print cmd['args']
     if isinstance(p[2], str):
         cmd['constants'] = p[2]
         arg_start = 3
